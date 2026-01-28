@@ -1,0 +1,49 @@
+{
+  "name": "react-apps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "build:ssg": "vite-react-ssg build --config vite.config.ssg.ts",
+    "build:storybook": "storybook build",
+    "start": "vite dev",
+    "start:vite:ssg": "vite-react-ssg dev --config vite.config.ssg.ts",
+    "start:dev": "concurrently \"npm start\" \"npm run start:dev:server\"",
+    "start:dev:vite": "concurrently \"npm run start:vite\" \"npm run start:dev:server\"",
+    "start:dev:server": "node ./json-server/index.js",
+    "deploy": "gh-pages -d dist -r https://github.com/10takla/react-apps.git",
+    "predeploy": "vite build --mode deploy && cp dist/index.html dist/404.html",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "build-storybook -c ./config/storybook"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "*",
+    "convex-hull": "^1.0.3",
+    "gh-pages": "^6.3.0",
+    "react": "*",
+    "react-dom": "*",
+    "react-redux": "^9.1.0"
+  },
+  "devDependencies": {
+    "@react-three/drei": "^9.102.6",
+    "@react-three/fiber": "^8.16.0",
+    "@storybook/react": "^8.0.5",
+    "@storybook/test": "^8.0.5",
+    "@types/react-dom": "^19.1.2",
+    "@typescript-eslint/parser": "^8.54.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint-plugin-import-quotes": "^0.0.1",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "prop-types": "^15.8.1",
+    "puppeteer": "^24.22.3",
+    "react-router-dom": "^6.30.1",
+    "sass": "^1.72.0",
+    "sirv": "^3.0.2",
+    "storybook": "^8.0.5",
+    "typescript": "^5.4.5",
+    "vite": "^6.3.6",
+    "vite-plugin-svgr": "*"
+  }
+}

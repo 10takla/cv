@@ -1,0 +1,65 @@
+.WorkExperience {
+    >li {
+        .achievements {
+            list-style-position: outside;
+            list-style-type: none;
+            padding-left: 0em;
+
+            >li {
+                $padding: 0.8em;
+                padding-left: $padding;
+                text-indent: -1 * $padding;
+
+                >ul {
+                    padding-left: 0.8em;
+                    list-style-type: none;
+
+                    li {
+                        $padding: 0.8em;
+                        padding-left: $padding;
+                        text-indent: -1 * $padding;
+                    }
+                }
+            }
+        }
+
+        // first stack
+        ul.stack.firstLevel {
+            gap: 0.2em 0.6em;
+
+            >li {
+                border: 0.1em solid rgba(0, 0, 0, 0.425);
+                padding: 0 0.2em;
+                background: rgba(226, 226, 226, 0.503);
+
+                >ul.stack {
+                    column-gap: 0.2em;
+                    flex-wrap: nowrap;
+
+                    >li {
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+
+        .stack {
+            list-style: none;
+            flex-wrap: wrap;
+            padding: 0;
+            align-items: center;
+
+            li {
+                flex-wrap: wrap;
+                align-items: center;
+                border-radius: 0.15em;
+                box-sizing: border-box;
+
+                a {
+                    color: black;
+                }
+            }
+        }
+    }
+
+}

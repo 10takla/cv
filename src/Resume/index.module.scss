@@ -1,0 +1,5 @@
+.App {
+    @at-root body:has(.App) {
+        background: rgb(117, 117, 117);
+    }
+}

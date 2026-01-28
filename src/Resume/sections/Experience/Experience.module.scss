@@ -1,0 +1,73 @@
+.Experience {
+
+    ul,
+    ol {
+        // margin: 0;
+    }
+
+    // *:not(li) {
+    //     text-align: justify;
+
+    //     & li {
+    //         text-align: start;
+    //     }
+    // }
+
+    .algoLinks {
+        text-align: end;
+        font-size: 0.8em;
+        height: 100%;
+        column-gap: 0.3em;
+
+        svg {
+            $size: 2.6em;
+            width: $size;
+            height: $size;
+
+            &[id="codewars"] {
+                width: $size - 0.3em;
+                height: $size - 0.3em;
+            }
+        }
+    }
+
+    >.item {
+        &:first-child {
+            border-top: 0;
+        }
+
+        border-top: 0.1em solid black;
+        margin: 0;
+        padding-block: 0.2em 0.6em;
+
+        h4 {
+            text-align: center;
+            margin: 0;
+            margin-block: 0.3em 0.2em;
+        }
+
+        p {
+            margin: 0;
+            margin-bottom: 0.4em;
+        }
+
+        ol,
+        ul {
+            gap: 0.3em;
+            margin: 0;
+            // margin-block: 0.2em;
+            padding-left: 2em;
+        }
+
+        >.petProjects {
+            padding-left: 1em;
+        }
+    }
+
+    .lang {
+        padding: 0 0.1em;
+        background-color: #dfdfdf;
+        border-radius: 0.2em;
+        white-space: nowrap;
+    }
+}

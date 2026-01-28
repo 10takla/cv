@@ -1,0 +1,31 @@
+.Quote {
+    margin: 0;
+    $padding: .7em;
+    padding: $padding $padding + 0.3;
+    box-sizing: border-box;
+    position: relative;
+    font-style: italic;
+    
+    // text-align: justify;
+
+    $q-font-size: .7em * 4;
+
+    &::before {
+        content: "“";
+        font-family: 'Georgia', serif;
+        position: absolute;
+        top: -0.2 / 4 * $q-font-size;
+        left: -0.1 / 4 * $q-font-size;
+        font-size: $q-font-size;
+    }
+
+    &::after {
+        content: "”";
+        font-family: 'Georgia', serif;
+        position: absolute;
+        bottom: -0.7em;
+        right: 0.1 / 4 * $q-font-size;
+        font-size: $q-font-size;
+    }
+
+}

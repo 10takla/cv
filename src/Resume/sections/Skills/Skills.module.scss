@@ -1,0 +1,121 @@
+.Skills {
+    font-optical-sizing: auto;
+    font-style: normal;
+
+    font-optical-sizing: auto;
+    flex-wrap: wrap;
+    
+    row-gap: 0.6em;
+    column-gap: 1.8em;
+    padding: 0;
+    // flex-wrap: wrap;
+    width: 100%;
+
+    // display: grid;
+    $all: 100;
+    // grid-template-columns: repeat($all, auto);
+    // grid-row-gap: 0em;
+    // grid-column-gap: 0em;
+
+
+    $a: 99;
+
+    li {
+        list-style-type: none;
+    }
+
+    ul,
+    ol,
+    il,
+    & {
+        margin: 0;
+    }
+
+    .outline {
+        position: absolute;
+        // width: 100%;
+        // height: 100%;
+    }
+
+    .skillBlock {
+        flex: 1 1 40%;
+        font-size: 0.86em;
+        row-gap: 0em;
+
+        .skills {
+            flex-wrap: wrap;
+            padding: 0.3em;
+            gap: 0.5em 0.9em;
+
+            .skill {
+                // background: rgb(237, 237, 237);
+                background: var(--color);
+                // border: 0.15em solid var(--color);
+                border-radius: 0.2em;
+                overflow: hidden;
+                box-shadow: 0 0.4em 0.8em rgba(0, 0, 0, 0.3);
+                box-sizing: border-box;
+                color: black;
+
+                a {
+                    color: var(--webkit-color)
+                }
+
+                &:hover:has(a) {
+                    transform: translateY(-0.4em);
+                }
+
+                &:active:has(a) {
+                    transform: translateY(0);
+                }
+
+                $padding: 0.25em;
+                $padding-between: 0.1em;
+
+                >.name {
+                    padding: 0.2em;
+                    padding-inline: $padding $padding-between;
+                }
+
+                >.level {
+                    padding-inline: $padding-between $padding;
+                    background: var(--color);
+
+                    >meter {
+                        appearance: none;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        width: 0;
+                        height: 0;
+                        position: absolute;
+                        opacity: 0;
+                    }
+
+                    >.backGround {
+                        font-size: 0.3em;
+                        position: relative;
+
+                        svg {
+                            fill: black
+                        }
+
+                        >.frontGround {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+
+                            svg {
+                                fill: gold;
+                            }
+                        }
+                    }
+
+                    svg {
+                        width: 2em;
+                        height: 2em;
+                    }
+                }
+            }
+        }
+    }
+}

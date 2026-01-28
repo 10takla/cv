@@ -1,0 +1,55 @@
+.PetProjects {
+    list-style-type: none;
+    padding-left: 0 !important;
+    $padding: 0.1em;
+    $marker-width: 1.1em + $padding;
+    $font-size: 1.2em;
+    margin: 0;
+
+    >li {
+        margin-bottom: 0.6em;
+        counter-increment: marker;
+        padding-left: $marker-width + 0.6em;
+        line-height: 1.2;
+        position: relative;
+
+        >dt>a {
+            font-size: $font-size;
+        }
+
+        >dd {
+            margin-left: 1em;
+        }
+
+
+        &::before {
+            content: counter(marker);
+            /* вставляем номер */
+            position: absolute;
+            inset-inline-start: 0;
+            left: 0;
+            top: 0;
+            padding: $padding;
+            width: $marker-width;
+            height: $marker-width;
+            border-radius: 50%;
+            /* кружок */
+            background: black;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            box-sizing: border-box;
+            font-size: $font-size;
+
+            /* Центрируем по первой строке */
+            inset-block-start: calc((1lh - $marker-width) / 2); // современно
+
+            /* Фолбэк для браузеров без lh: приблизим по em */
+            @supports not (height: 1lh) {
+                inset-block-start: calc((1em - $marker-width) / 2);
+            }
+        }
+    }
+}

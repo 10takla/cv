@@ -1,0 +1,110 @@
+.SimplePage {
+    font-size: 13.6px;
+    padding: 3em 3em;
+    max-height: none;
+
+    p,
+    h2,
+    ul,
+    ol {
+        // all: unset;
+        margin: 0;
+    }
+
+    ol,
+    ul {
+        margin: unset;
+        padding: unset;
+
+        li {
+            margin: unset;
+        }
+
+        padding-left: 2em;
+    }
+
+    gap: 1.2em;
+
+    header {
+        .contacts {
+            font-size: 13px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+    }
+
+    main {
+        gap: 1.4em;
+    }
+
+    .block {
+        h2 {
+            text-decoration: none;
+            text-underline-offset: 0.2em;
+            font-size: 1.15em;
+            margin-bottom: 0.3em;
+        }
+
+        h3,
+        h4 {
+            font-size: 1em;
+        }
+
+        $bullet-point-left-padding: 1.5em;
+
+        .petProjects {
+            list-style-type: unset;
+            padding-left: $bullet-point-left-padding !important;
+
+            li {
+                padding-left: unset;
+
+                &::before {
+                    all: unset;
+                }
+
+                dd {
+                    margin-left: 0em;
+
+                    i {
+                        font-style: normal;
+                    }
+                }
+            }
+        }
+
+        .workExperience {
+            ul {
+                padding-left: $bullet-point-left-padding !important;
+
+                ul {
+                    padding-left: 1em !important;
+                }
+            }
+
+            .stack {
+                padding-left: 0em !important;
+
+                li {
+                    // margin: 0 !important;
+                    // padding: 0 !important;
+                }
+            }
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+            padding: 0 !important;
+            gap: 0.1em 1em;
+            justify-content: space-between;
+
+
+            &::after {
+                content: "";
+                flex: 1 1 auto;
+            }
+        }
+    }
+}
