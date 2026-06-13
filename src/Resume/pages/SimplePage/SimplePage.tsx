@@ -267,7 +267,7 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                                                                         ))}
                                                                                     </VStack>
                                                                                     :
-                                                                                    <Fragment key={i}>{renderAbbr(v, lang)}:</Fragment>
+                                                                                    <span key={i}>{renderAbbr(v, lang)}:</span>
                                                                             ))
                                                                         }
                                                                     </VStack>
@@ -315,7 +315,7 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                     <HStack style={{
                                         fontWeight: "bold",
                                         justifyContent: "space-between",
-                                        alignItems: "center",
+                                        // alignItems: "center",
                                     }}>
                                         <h3>
                                             Micro-SaaS (

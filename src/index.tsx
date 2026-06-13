@@ -7,13 +7,15 @@ import {
 import Resume, { DemoMode, DemoStuct as DemoStruct } from "./Resume"
 import { Suspense } from "react";
 import { VStack } from "./shared/ui/Stack";
+import { MODES } from "../configs/pages";
 
 const root = createRoot(document.getElementById('root')!);
 
 export const sites = {
-    release: <Resume />,
-    demo: <Resume demo={new DemoStruct(DemoMode.Demo)} />,
+    [MODES.RELEASE]: <Resume />,
+    [MODES.DEMO]: <Resume demo={new DemoStruct(DemoMode.Demo)} />,
 };
+
 
 root.render(
     <Suspense>

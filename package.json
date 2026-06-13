@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "vite build && cp dist/index.html dist/404.html",
+    "build": "vite build && node -e \"import('fs').then(m => m.copyFileSync('dist/index.html', 'dist/404.html'))\"",
     "build:ssg": "vite-react-ssg build --config vite.config.ssg.ts",
     "build:storybook": "storybook build",
     "start": "vite dev",
@@ -13,7 +13,7 @@
     "start:dev:vite": "concurrently \"npm run start:vite\" \"npm run start:dev:server\"",
     "start:dev:server": "node ./json-server/index.js",
     "deploy": "gh-pages -d dist -r https://github.com/10takla/cv.git",
-    "predeploy": "vite build --mode deploy && cp dist/index.html dist/404.html",
+    "predeploy": "vite build --mode deploy && node -e \"import('fs').then(m => m.copyFileSync('dist/index.html', 'dist/404.html'))\"",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "build-storybook -c ./config/storybook"
   },

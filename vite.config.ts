@@ -6,6 +6,15 @@ import fs from 'fs';
 import http from 'http';
 import sirv from 'sirv';
 import puppeteer from 'puppeteer';
+import {
+  MODES,
+  PAGES,
+  LANGUAGES
+} from './configs/pages'
+
+const modes = Object.values(MODES);
+const pages = Object.values(PAGES);
+const languages = Object.values(LANGUAGES);
 
 export const baseConfig = (mode) => ({
   server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
@@ -23,29 +32,16 @@ export const baseConfig = (mode) => ({
 export default defineConfig(({ mode }) => {
   const BASE = mode === 'deploy' ? '/cv' : '';
 
-  const modes = [
-    "release",
-    "demo"
-  ]
   const ROUTES = [
     ...modes.flatMap(mode => (
-      [
-        "ru",
-        "en"
-      ].map(lang => [mode, lang].join("/"))
+      languages.map(lang => [mode, lang].join("/"))
     )),
     ...modes.flatMap(mode => (
-      [
-        "pdf-content",
-        "simple-page",
-        "simple-page/v2"
-      ].flatMap(p => [
-        "ru",
-        "en"
-      ].map(lang => [mode, p, lang].join("/")))
+      pages.flatMap(p => languages.map(lang => [mode, p, lang].join("/")))
     )),
     "/"
   ];
+  console.log(ROUTES)
   const PORT = 4179;
 
   const prerender = () => ({

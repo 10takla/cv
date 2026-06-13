@@ -10,6 +10,7 @@ import SimplePage, { experienceData } from "./pages/SimplePage/SimplePage";
 import { experienceData as experienceDataV2 } from "./pages/SimplePage/SimplePageV2"
 import Pdf from "./pages/ui/Pdf/Pdf";
 import { MicroSaaS, MicroSaaSV2 } from "./pages/SimplePage/sections/MicroSaaS";
+import { PAGES, LANGUAGES } from "../../configs/pages";
 
 export const Chapter = forwardRef(({ className, children, head, ...otherProps }: { children: ReactNode } & HtmlProps, ref: ForwardedRef<ElementRef<typeof VStack>>) => {
     return (
@@ -61,14 +62,14 @@ const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "
     }, []);
 
     const pages = [
-        ["release-page", <ReleasePdfPage demo={demo} />],
-        ["simple-page", <SimplePdfPage demo={demo} />],
-        ["simple-page/v2", <SimplePdfPageV2 demo={demo} />],
-    ]
+        [PAGES.RELEASE_PAGE, <ReleasePdfPage demo={demo} />],
+        [PAGES.SIMPLE_PAGE, <SimplePdfPage demo={demo} />],
+        [PAGES.SIMPLE_PAGE_V2, <SimplePdfPageV2 demo={demo} />],
+    ] as const
 
     return (
         <HStack className={cls.App} style={{ gap: "0.5em" }} >
-            <LanguageProvider lang="ru">
+            <LanguageProvider lang={LANGUAGES.RU}>
                 {(() => {
                     const V = () => {
                         useSiteName(demo)
@@ -79,31 +80,35 @@ const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "
                 <Routes>
                     {pages.map(([linkName, page], i) => (
                         <Fragment key={i}>
-                            <Route path={linkName} element={<Navigate to="ru" replace />} />
+                            <Route path={linkName} element={<Navigate to={LANGUAGES.RU} replace />} />
                             <Route path={`${linkName}/*`} element={page} />
                         </Fragment>
                     ))}
-                    <Route index element={<Navigate to="ru" replace />} />
-                    <Route
-                        path="ru/*"
-                        element={
-                            <HStack style={{ gap: "1.2em" }}>
-                                {pages.map(([linkName, page], i) => (
-                                    <VStack style={{ gap: "0.6em" }} key={i}>
-                                        <Link to={`../${linkName}/ru`} className={cls.link}
-                                            style={{
-                                                background: "white",
-                                                textAlign: "center",
-                                                padding: "0.4em"
-                                            }}
-                                        >
-                                            {linkName}
-                                        </Link>
-                                        {page}
-                                    </VStack>
-                                ))}
-                            </HStack>
-                        } />
+                    <Route index element={<Navigate to={LANGUAGES.RU} replace />} />
+                    {Object.values(LANGUAGES).map((lang) => (
+                        <Route
+                            key={lang}
+                            path={`${lang}/*`}
+                            element={
+                                <HStack style={{ gap: "1.2em" }}>
+                                    {pages.map(([linkName, page], i) => (
+                                        <VStack style={{ gap: "0.6em" }} key={i}>
+                                            <Link to={`../${linkName}/${lang}`} className={cls.link}
+                                                style={{
+                                                    background: "white",
+                                                    textAlign: "center",
+                                                    padding: "0.4em"
+                                                }}
+                                            >
+                                                {linkName}
+                                            </Link>
+                                            {page}
+                                        </VStack>
+                                    ))}
+                                </HStack>
+                            }
+                        />
+                    ))}
                 </Routes>
             </LanguageProvider>
         </HStack>
@@ -140,7 +145,7 @@ const useSiteName = (demo: Demo.demo) => {
 
     useEffect(() => {
         const [title, preTitle] = titleData;
-        title.textContent = `${lang == "ru" ? "Резюме" : "CV"}. ${demo.isDemo() ? (lang == "ru" ? "Имя Фамилия" : "First Last Name") : (lang == "ru" ? "Абакар Летифов" : "Abakar Letifov")}.pdf`;
+        title.textContent = `${lang == LANGUAGES.RU ? "Резюме" : "CV"}. ${demo.isDemo() ? (lang == LANGUAGES.RU ? "Имя Фамилия" : "First Last Name") : (lang == LANGUAGES.RU ? "Абакар Летифов" : "Abakar Letifov")}.pdf`;
 
         return () => {
             title.textContent = preTitle

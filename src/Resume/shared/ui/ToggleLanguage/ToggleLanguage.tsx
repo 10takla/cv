@@ -4,6 +4,7 @@ import cls from './ToggleLanguage.module.scss';
 import Select from '/src/shared/ui/Kit/Select';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HtmlProps } from '@react-three/drei/web/Html';
+import { LANGUAGES } from '../../../../../configs/pages';
 
 type Component = typeof Select;
 type ElRef = ElementRef<Component> | null;
@@ -40,28 +41,31 @@ const ToggleLanguage = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) =>
     const lang = useMemo(() => {
         if (isNotNavigate) return
         const lang = location.pathname.split('/').filter(Boolean).pop();
-        if (lang == "ru" || lang == "en") {
-            setLang(lang)
-            return lang
+        if (lang === LANGUAGES.RU || lang === LANGUAGES.EN) {
+            setLang(lang as Lang)
+            return lang as Lang
         }
     }, [location, isNotNavigate]);
     const navigate = useNavigate();
-console.log(lang)
+
     return (
         <>
-            {/* {!isNotNavigate && <Routes>
-                <Route index element={<Navigate to={lang} replace />} />
-            </Routes>} */}
             <Select
                 className={classNames(cls.ToggleLanguage, [className])}
                 ref={toggleLanguageRef}
-                values={[["ru", "Рус"], ["en", "Eng"],]}
+                values={[[LANGUAGES.RU, "Рус"], [LANGUAGES.EN, "Eng"]]}
                 value={lang}
                 defaultValue={lang}
                 {...otherProps}
                 onChange={(value) => {
-                    !isNotNavigate && navigate(value, { replace: true });
-                    setLang(value);
+                    if (!isNotNavigate) {
+                        const segments = location.pathname.split('/').filter(Boolean);
+                        if (segments.length > 0) {
+                            segments[segments.length - 1] = value;
+                            navigate('/' + segments.join('/') + location.search + location.hash, { replace: true });
+                        }
+                    }
+                    setLang(value as Lang);
                 }}
             />
         </>
@@ -94,8 +98,8 @@ export const T = ({ children, ...otherProps }: TProps) => {
 }
 
 
-export type Lang = "en" | "ru"
-export const langContext = createContext<[(key: string) => string, [Lang, Dispatch<SetStateAction<Lang>>]]>([(key) => key, ["en", () => { }]])
+export type Lang = typeof LANGUAGES[keyof typeof LANGUAGES];
+export const langContext = createContext<[(key: string) => string, [Lang, Dispatch<SetStateAction<Lang>>]]>([(key) => key, [LANGUAGES.EN, () => { }]])
 
 export const LanguageProvider = ({ children, lang: l }: { children: ReactNode, lang: Lang }) => {
     const [lang, setLang] = useState<Lang>(l)
