@@ -18,7 +18,9 @@ module.exports = {
     ],
     rules: {
         'unused-imports/no-unused-imports': 'error',
-        quotes: "off"// "unused-imports/no-unused-vars": [
+        quotes: "off",
+        "react/jsx-key": "off"
+        // "unused-imports/no-unused-vars": [
         //     "warn",
         //     { "vars": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
         // ],

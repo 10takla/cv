@@ -104,8 +104,8 @@ export const experienceData = [
     {
         id: "WEBSYSTEMS",
         name: <T
-            ru="ВЕБСИСТЕМС, E-commerce (Highload)"
-            en="WEBSYSTEMS, E-commerce (Highload)"
+            ru="ВЕБСИСТЕМС, E-commerce компания (интернет-магазин)"
+            en="WEBSYSTEMS, E-commerce компания (интернет-магазин)"
         />,
         position: <T ru="Rust Backend Developer" en="Rust Backend Developer" />,
         description: <T

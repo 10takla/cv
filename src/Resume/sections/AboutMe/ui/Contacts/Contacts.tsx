@@ -34,7 +34,7 @@ const contacts = [
     },
     {
         link: "https://crates.io/users/10takla",
-        img: "https://crates.io/assets/cargo.png",
+        img: "https://crates.io/_app/immutable/assets/cargo.BEjkIoV4.png",
         text: "crates.io",
     },
     {
@@ -77,7 +77,7 @@ const contactsDemo = [
     },
     {
         link: "https://crates.io",
-        img: "https://crates.io/assets/cargo.png",
+        img: "https://crates.io/_app/immutable/assets/cargo.BEjkIoV4.png",
         text: "crates.io",
     },
 
@@ -118,7 +118,7 @@ const Contacts = (props: ContactsProps, ref: ForwardedRef<ElRef>) => {
             return contacts
         }
     }, [demo])
-    
+
     return (
         <HStack
             className={classNames(cls.Contacts, [className])}

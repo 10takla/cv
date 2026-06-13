@@ -102,6 +102,53 @@ const other = {
     Английский: { level: <abbr title="CEFR A2 — Elementary">A2</abbr>, stars: 2, en: "English", isId: true }
 }
 
+const aiSkills = {
+    // --- Агентные менеджеры / AI IDE ---
+    "Antigravity": { stars: 5, isId: true },
+    "Codex": { stars: 5, isId: true },
+
+    // --- Чат-интерфейсы / Playground ---
+    "Google AI Studio": { stars: 5, isId: true },
+    "OpenAI Playground": { stars: 3, isId: true },
+    "Claude.ai": { stars: 4, isId: true },
+    "Grok": { stars: 3, isId: true },
+    "DeepSeek": { stars: 3, isId: true },
+    "Perplexity": { stars: 3, isId: true },
+
+    // --- Промпт-инжиниринг ---
+    "Prompt Engineering": {
+        "childs": {
+            "System Prompts (rules, skills, workflows)": { stars: 3, isId: true }, // Написание системных инструкций: правила поведения, навыки, сценарии
+            "Few-shot Prompting": { stars: 3, isId: true }, // Обучение модели на примерах прямо в промпте
+            "Chain-of-Thought": { stars: 3, isId: true }, // Побуждение модели рассуждать пошагово
+            "Prompt Versioning": { stars: 3, isId: true }, // Версионирование промптов в файлах (md, git)
+            "Prompt Chaining": { stars: 3, isId: true }, // Последовательная передача результата одного промпта в следующий
+        }
+    },
+
+    "Agentic AI": {
+        "childs": {
+            // Model Context Protocol — стандарт подключения внешних инструментов к агенту
+            "MCP": { stars: 3, isId: true },
+            // Управление несколькими агентами: делегирование, координация
+            "Agent Orchestration": { stars: 3, isId: true },
+            // Подключение внешних баз знаний к агенту
+            "Knowledge Bases": { stars: 3, isId: true },
+            // Управление окном контекста: что передавать, что обрезать
+            "Context Management": { stars: 3, isId: true },
+        }
+    },
+
+    // // Транскрибаторы ИИ
+    // "Speech-to-Text": {
+    //     childs: {
+    //         "OpenAI Whisper V3": { stars: 4, isId: true },
+    //         "Gemini 1.5 Audio": { stars: 3, isId: true },
+    //         "NVIDIA Canary": { stars: 3, isId: true },
+    //     }
+    // }
+}
+
 export const skills = [
     {
         block: "Rust",
@@ -110,6 +157,11 @@ export const skills = [
     {
         block: <T ru="Языки программирования" en="Programming Languages" />,
         skills: langSkills,
+    },
+    {
+        block: <T ru="ИИ и Агенты" en="AI & Agents" />,
+        skills: aiSkills,
+        isAi: true,
     },
     {
         block: "Backend",
@@ -124,9 +176,16 @@ export const skills = [
         skills: other,
     }
 ]
-    .map(({ block, skills }) => ({
+    .map(({ block, skills, isAi }) => ({
         block,
-        skills: Object.entries(skills).map(([name, other]) => ({ name, ...other }))
+        isAi,
+        skills: Object.entries(skills).map(([name, other]: [string, any]) => {
+            const skill: any = { name, ...other };
+            if (skill.childs) {
+                skill.childs = Object.entries(skill.childs).map(([cName, cOther]: [string, any]) => ({ name: cName, ...cOther }));
+            }
+            return skill;
+        })
     }));
 
 import { Lang, T } from '../ui/ToggleLanguage/ToggleLanguage'

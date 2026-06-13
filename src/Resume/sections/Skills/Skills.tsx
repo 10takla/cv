@@ -45,7 +45,7 @@ const Skills = (props: SkillsProps, ref: ForwardedRef<ElRef>) => {
                     <VStack tag="li" className={cls.skillBlock} key={i}>
                         {block}:
                         <HStack tag="ul" className={cls.skills}>
-                            {skills.map((skill, i) => (
+                            {skills.flatMap((skill: any) => skill.childs ? skill.childs : [skill]).map((skill, i) => (
                                 <Highlight id={skill.isId && `${skill.name}`} className={cls.skill} key={i}>
                                     <HStack className={cls.skill} key={i} tag="li" align="stretch"
                                         style={{ "--color": getRgbGradient(skill.stars, { saturation: 60 }) }}

@@ -10,7 +10,7 @@ import { VStack } from "./shared/ui/Stack";
 
 const root = createRoot(document.getElementById('root')!);
 
-const sites = {
+export const sites = {
     release: <Resume />,
     demo: <Resume demo={new DemoStruct(DemoMode.Demo)} />,
 };

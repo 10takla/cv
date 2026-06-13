@@ -7,11 +7,45 @@ import http from 'http';
 import sirv from 'sirv';
 import puppeteer from 'puppeteer';
 
+export const baseConfig = (mode) => ({
+  server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
+  build: { target: 'es2019' },
+  base: mode === 'deploy' ? '/cv/' : '',
+  resolve: {
+    alias: [
+      { find: 'shared', replacement: '/src/shared' },
+      { find: 'resume', replacement: '/src/Resume' },
+    ],
+  },
+  esbuild: { supported: { 'top-level-await': true } }
+})
+
 export default defineConfig(({ mode }) => {
-  const BASE = mode === 'deploy' ? '/react-apps' : '';
+  const BASE = mode === 'deploy' ? '/cv' : '';
+
+  const modes = [
+    "release",
+    "demo"
+  ]
   const ROUTES = [
-    // `/resume/v1/ru`, `/resume/v1/en`, `/resume/v2/ru`, `/resume/v2/en`
-  ].map((v) => BASE + v);
+    ...modes.flatMap(mode => (
+      [
+        "ru",
+        "en"
+      ].map(lang => [mode, lang].join("/"))
+    )),
+    ...modes.flatMap(mode => (
+      [
+        "pdf-content",
+        "simple-page",
+        "simple-page/v2"
+      ].flatMap(p => [
+        "ru",
+        "en"
+      ].map(lang => [mode, p, lang].join("/")))
+    )),
+    "/"
+  ];
   const PORT = 4179;
 
   const prerender = () => ({
@@ -29,9 +63,9 @@ export default defineConfig(({ mode }) => {
       try {
         for (const route of ROUTES) {
           const page = await browser.newPage();
-          await page.goto(`http://localhost:${PORT}${route}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`http://localhost:${PORT}${BASE}/${route}`, { waitUntil: 'domcontentloaded' });
           await Promise.race([
-            page.evaluate(() => new Promise(r => setTimeout(r, 10000))),
+            page.evaluate(() => new Promise(r => setTimeout(r, 1000))),
             page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 800 }).catch(() => { }),
           ]);
           let html = await page.content();
@@ -61,16 +95,7 @@ export default defineConfig(({ mode }) => {
   });
 
   return {
-    server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
-    build: { target: 'es2019' },
+    ...baseConfig(mode),
     plugins: [svgr(), react(), prerender()],
-    base: mode === 'deploy' ? '/react-apps/' : '/',
-    resolve: {
-      alias: [
-        { find: 'shared', replacement: '/src/shared' },
-        { find: 'resume', replacement: '/src/Resume' },
-      ],
-    },
-    esbuild: { supported: { 'top-level-await': true } }
   };
 });

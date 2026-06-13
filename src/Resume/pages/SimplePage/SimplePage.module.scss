@@ -45,9 +45,15 @@
             margin-bottom: 0.3em;
         }
 
+
         h3,
         h4 {
             font-size: 1em;
+            margin: 0
+        }
+
+        h3 {
+            font-size: 1.15em;
         }
 
         $bullet-point-left-padding: 1.5em;

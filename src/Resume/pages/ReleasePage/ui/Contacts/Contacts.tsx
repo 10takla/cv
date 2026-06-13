@@ -7,6 +7,7 @@ import GitHubSvg from "resume/sections/AboutMe/ui/Contacts/svgs/git-hub.svg?reac
 import MailStar from "resume/sections/AboutMe/ui/Contacts/svgs/mail.svg?react";
 import TelegramSvg from "resume/sections/AboutMe/ui/Contacts/svgs/telegram.svg?react";
 import WhatsAppSvg from "resume/sections/AboutMe/ui/Contacts/svgs/whatsapp.svg?react";
+import CratesIo from "resume/sections/AboutMe/ui/Contacts/svgs/crates.io.avif";
 import HHRuSvg from "resume/sections/AboutMe/ui/Contacts/svgs/hh.svg?react";
 import { langContext, t, T } from '/src/Resume/shared/ui/ToggleLanguage/ToggleLanguage';
 import { Demo, DemoMode } from '/src/Resume';
@@ -77,7 +78,7 @@ export const contactsList = [
     },
     {
         id: "telegram",
-        link: "https://t.me/Corvo116",
+        link: "https://t.me/co_932",
         svg: <TelegramSvg />,
         text: "@co_932",
     },
@@ -88,7 +89,7 @@ export const contactsList = [
     },
     {
         link: "https://crates.io/users/10takla",
-        img: "https://crates.io/assets/cargo.png",
+        img: CratesIo,
         text: "crates.io",
     },
     {
@@ -132,7 +133,7 @@ export const contactsDemo = [
     },
     {
         link: "https://crates.io",
-        img: "https://crates.io/assets/cargo.png",
+        img: "https://crates.io/_app/immutable/assets/cargo.BEjkIoV4.png",
         text: "crates.io",
     },
     {

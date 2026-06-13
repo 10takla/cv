@@ -1,44 +1,133 @@
-import { forwardRef, memo, ForwardedRef, ComponentProps, useImperativeHandle, useRef, ElementRef, useMemo, useContext } from 'react';
-import { HStack, VStack } from '/src/shared/ui/Stack';
-import { classNames } from '/src/shared/lib/classNames/classNames';
+import { forwardRef, memo, ForwardedRef, ComponentProps, useImperativeHandle, useRef, ElementRef, useMemo, useContext, Fragment, ReactNode, cloneElement, isValidElement } from 'react';
+import { HStack, VStack } from 'shared/ui/Stack';
+import { classNames } from 'shared/lib/classNames/classNames';
 import cls from './SimplePage.module.scss';
-import pdf_cls from '../PdfPage.module.scss';
-import ToggleLanguage, { langContext, t, T } from '/src/Resume/shared/ui/ToggleLanguage/ToggleLanguage';
-import { Demo } from '/src/Resume';
-import FerrisSvg from "/src/Resume/shared/assets/imgs/Ferris.svg?react"
-import { backgroundClip } from 'html2canvas/dist/types/css/property-descriptors/background-clip';
+import { langContext, t, T } from 'resume/shared/ui/ToggleLanguage/ToggleLanguage';
+import { Demo } from 'resume';
 import Contacts from '../ReleasePage/ui/Contacts/Contacts';
-import Education, { educs } from '../ReleasePage/ui/Education/Education';
-import Skills from '/src/Resume/sections/Skills/Skills';
-import Block from '/src/Resume/shared/ui/Block/Block';
-import block_cls from '/src/Resume/shared/ui/Block/Block.module.scss';
-import SkillLine from '../ReleasePage/ui/SkillLine/SkillLine';
-import WorkExperience, { demoExperienceList } from '../ReleasePage/ui/WorkExperience/WorkExperience';
-import PetProjects from '/src/Resume/sections/Experience/PetProjects/PetProjects';
-import { skills } from '/src/Resume/shared/const/info';
-import { Time, TimeLineProps, TimeLineWithLength } from '/src/Resume/shared/ui/TimeLine/TimeLine';
-import { HightlightLink } from '/src/Resume/shared/ui/Hightlight/Hightlight';
-import { listStyleType } from 'html2canvas/dist/types/css/property-descriptors/list-style-type';
-import { backgroundRepeat } from 'html2canvas/dist/types/css/property-descriptors/background-repeat';
-import { backgroundSize } from 'html2canvas/dist/types/css/property-descriptors/background-size';
-import Pdf from '../ReleasePage/ui/Pdf/Pdf';
-import Tag from '/src/shared/ui/Stack/Tag/Tag';
-import { backgroundImage } from 'html2canvas/dist/types/css/property-descriptors/background-image';
-import MicroSaaS from './sections/MicroSaaS';
+import { educs } from '../ReleasePage/ui/Education/Education';
+import Block from 'resume/shared/ui/Block/Block';
+import { demoExperienceList } from '../ReleasePage/ui/WorkExperience/WorkExperience';
+import PetProjects from 'resume/sections/Experience/PetProjects/PetProjects';
+import { skills } from 'resume/shared/const/info';
+import { Time, TimeLineProps } from 'resume/shared/ui/TimeLine/TimeLine';
+import PrivateConnectivitySvg from "./sections/private_connectivity.svg?react"
+import ConstructionSvg from "./sections/construction.svg?react"
+
+
+const abbrDefinitions: Record<string, { ru: string, en: string }> = {
+    "JNI": {
+        ru: "Java Native Interface — интерфейс взаимодействия Java с native-кодом",
+        en: "Java Native Interface"
+    },
+    "CI/CD": {
+        ru: "Continuous Integration / Continuous Delivery — непрерывная интеграция и доставка",
+        en: "Continuous Integration / Continuous Delivery"
+    },
+    "MCP": {
+        ru: "Model Context Protocol — открытый стандарт подключения внешних инструментов и источников данных к ИИ-агентам",
+        en: "Model Context Protocol"
+    },
+    "SDK": {
+        ru: "Software Development Kit — комплект средств разработки",
+        en: "Software Development Kit"
+    },
+    "DSL": {
+        ru: "Domain Specific Language — предметно-ориентированный язык программирования",
+        en: "Domain Specific Language"
+    },
+    "AST": {
+        ru: "Abstract Syntax Tree — абстрактное синтаксическое дерево",
+        en: "Abstract Syntax Tree"
+    },
+    "ZPL": {
+        ru: "Zebra Programming Language — язык описания страниц, используемый в принтерах Zebra",
+        en: "Zebra Programming Language"
+    },
+    "CPCL": {
+        ru: "Comtec Printer Control Language — язык управления принтерами Comtec/Zebra",
+        en: "Comtec Printer Control Language"
+    },
+    "TSPL": {
+        ru: "TSPL (TSC Printer Language) — язык управления принтерами TSC",
+        en: "TSC Printer Language"
+    },
+    "NDK": {
+        ru: "Native Development Kit — набор инструментов для разработки на C/C++ под Android",
+        en: "Native Development Kit"
+    },
+    "OIDC": {
+        ru: "OpenID Connect — стандарт аутентификации на базе протокола OAuth 2.0",
+        en: "OpenID Connect"
+    },
+    "JWKS": {
+        ru: "JSON Web Key Set — набор ключей в формате JSON для проверки подлинности JWT",
+        en: "JSON Web Key Set"
+    }
+};
+
+const abbrRegex = /\b(JNI|CI\/CD|MCP|SDK|DSL|AST|ZPL|CPCL|TSPL|NDK|OIDC|JWKS)\b/g;
+
+const renderAbbr = (text: ReactNode, lang: 'ru' | 'en'): ReactNode => {
+    if (typeof text === 'string') {
+        const parts = text.split(abbrRegex);
+        if (parts.length === 1) return text;
+        return parts.map((part, index) => {
+            if (index % 2 === 1) {
+                const def = abbrDefinitions[part];
+                return (
+                    <abbr key={index} title={def[lang]}>
+                        {part}
+                    </abbr>
+                );
+            }
+            return part;
+        });
+    }
+    if (Array.isArray(text)) {
+        return text.map((child, index) => <Fragment key={index}>{renderAbbr(child, lang)}</Fragment>);
+    }
+    if (isValidElement(text)) {
+        if (text.type === 'abbr') {
+            return text;
+        }
+        let propsUpdate: any = {};
+        let hasUpdates = false;
+        if (text.props) {
+            if ('ru' in text.props) {
+                propsUpdate.ru = renderAbbr((text.props as any).ru, lang);
+                hasUpdates = true;
+            }
+            if ('en' in text.props) {
+                propsUpdate.en = renderAbbr((text.props as any).en, lang);
+                hasUpdates = true;
+            }
+            if ('children' in text.props && (text.props as any).children) {
+                propsUpdate.children = renderAbbr((text.props as any).children, lang);
+                hasUpdates = true;
+            }
+        }
+        if (hasUpdates) {
+            return cloneElement(text, propsUpdate);
+        }
+    }
+    return text;
+};
 
 type Component = typeof HStack;
 type ElRef = ElementRef<Component> | null;
 
 interface SimplePageProps extends ComponentProps<Component>, Demo {
-
+    microSaaS?: ReactNode;
 }
 
 const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
     const {
-        className, demo, experienceData,
+        className, demo, experienceData, microSaaS,
         ...otherProps
     } = props;
-
+    console.log(microSaaS)
+    const [_, [lang]] = useContext(langContext);
     const simplePageRef = useRef<ElRef>(null);
     useImperativeHandle<ElRef, ElRef>(
         ref,
@@ -67,9 +156,8 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
 
     return (
         <VStack
-            className={classNames(cls.SimplePage, [pdf_cls.pdf_page, className])}
+            className={classNames(cls.SimplePage, [className])}
             ref={simplePageRef}
-            id="simple-page"
             {...otherProps}
         >
             <VStack tag="header" align="center" style={{ width: "100%" }}>
@@ -131,14 +219,14 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                 {exprienceList
                                     .map(({ time, ...other }) => ({ ...other, time: time.map((v) => new Date(v)) }))
                                     .map(({ name, position, description, time, achievements, stack }, i) => (
-                                        <VStack key={i} tag="article"
+                                        <VStack tag="article" key={i}
                                             style={{
                                                 gap: "0.3em",
                                                 position: "relative"
                                             }}
                                         >
                                             <HStack tag="section" justify="between">
-                                                <h3 style={{ margin: 0 }}>{name}</h3>
+                                                <h3>{name}</h3>
                                                 <TimeDiapason time={{ start: time[0], end: time[1], }} />
                                             </HStack>
                                             <HStack tag="section" justify="between" style={{ color: "#6e6e6e", "white-space": "nowrap" }}>
@@ -151,7 +239,7 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                                 }
                                             </HStack>
                                             <VStack tag="section" align="start" style={{ gap: "0.3em" }}>
-                                                <p>{"— "}{description}.</p>
+                                                <p>{"— "}{renderAbbr(description, lang)}.</p>
                                                 <VStack tag="ul" className={cls.achievements}
                                                     style={{ gap: "0.2em" }}
                                                 >
@@ -161,15 +249,14 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                                                 Array.isArray(v) ?
                                                                     <VStack style={{ gap: "0.2em" }}>
                                                                         {
-                                                                            v.map((v) => (
-
+                                                                            v.map((v, i) => (
                                                                                 Array.isArray(v) ?
-                                                                                    <VStack tag="ul"
+                                                                                    <VStack tag="ul" key={i}
                                                                                         style={{ gap: "0.2em" }}
                                                                                     >
                                                                                         {v.map((item, i) => (
-                                                                                            <li>
-                                                                                                {item}
+                                                                                            <li key={i}>
+                                                                                                {renderAbbr(item, lang)}
                                                                                                 {
                                                                                                     i != v.length - 1 ?
                                                                                                         ";"
@@ -180,14 +267,12 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                                                                         ))}
                                                                                     </VStack>
                                                                                     :
-                                                                                    <>{v}:</>
-
-
+                                                                                    <Fragment key={i}>{renderAbbr(v, lang)}:</Fragment>
                                                                             ))
-                                                                        }</VStack>
-
+                                                                        }
+                                                                    </VStack>
                                                                     :
-                                                                    <>{v}.</>
+                                                                    <>{renderAbbr(v, lang)}.</>
                                                             }
                                                         </li>
                                                     ))}
@@ -207,9 +292,9 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                                     {stack.flat().map((v, i) => (
                                                         <li key={i} style={{ whiteSpace: "nowrap" }}>
                                                             {/* <i> */}
-                                                            {(typeof v == "object" && "name" in v) ?
+                                                            {renderAbbr((typeof v == "object" && "name" in v) ?
                                                                 v.name
-                                                                : v}
+                                                                : v, lang)}
                                                             {/* </i> */}
                                                         </li>
                                                     ))}
@@ -221,29 +306,126 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                             </VStack>
                         ],
                         [
-                            <>Micro-SaaS (
-                                <abbr title={t({ ru: "Business-to-Consumer — «бизнес для потребителя»", en: "Business-to-Consumer" })}>B2C
-                                </abbr>
-                                )
-                            </>,
-                            <MicroSaaS />
-                        ],
-                        [
                             <T ru={"Pet-проекты".toUpperCase()} en={"Pet projects".toUpperCase()} />,
-                            <PetProjects className={cls.petProjects} />
+                            <VStack style={{ width: "100%", gap: "0.8em" }}>
+                                <VStack style={{
+                                    width: "100%",
+                                    gap: "0.3em"
+                                }}>
+                                    <HStack style={{
+                                        fontWeight: "bold",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                    }}>
+                                        <h3>
+                                            Micro-SaaS (
+                                            <abbr
+                                                title={t({
+                                                    ru: "Business-to-Consumer — «бизнес для потребителя»",
+                                                    en: "Business-to-Consumer"
+                                                })}>
+                                                B2C
+                                            </abbr>
+                                            )
+                                        </h3>
+                                        <HStack style={{
+                                            gap: "0.2em",
+                                        }}>
+                                            <div
+                                                style={{ display: "inline-flex", boxSizing: "border-box" }}
+                                                title={t({ ru: "Проприетарный / Закрытый исходный код", en: "Proprietary / Closed Source" })}
+                                            >
+                                                <PrivateConnectivitySvg
+                                                    style={{ height: "100%" }}
+                                                />
+                                            </div>
+                                            {/* <div
+                                                style={{ display: "inline-flex", }}
+                                                title={t({ ru: "В разработке", en: "Under development" })}
+                                            >
+                                                <ConstructionSvg />
+                                            </div> */}
+                                        </HStack>
+                                    </HStack>
+                                    {renderAbbr(microSaaS, lang)}
+                                </VStack>
+                                <VStack style={{ width: "100%", gap: "0.3em" }}>
+                                    <h3>
+                                        <T ru="Библиотеки:" en="Libraries:" />
+                                    </h3>
+                                    <PetProjects className={cls.petProjects} />
+                                </VStack>
+                            </VStack>
                         ],
                         [
                             <T ru={"Навыки".toUpperCase()} en={"Skills".toUpperCase()} />,
-                            <HStack tag="ul" className={cls.skills}>
+                            <VStack style={{ gap: "0.3em", width: "100%" }}>
+                                <HStack tag="ul" className={cls.skills}>
+                                    {
+                                        [...new Map(skills.filter(s => !s.isAi).flatMap(s => s.skills).map(s => [s.name, s])).values()]
+                                            .filter((s: any) => !s.childs)
+                                            .map((skill: any, i) => (
+                                                <li style={{ whiteSpace: "nowrap" }} key={i}>
+                                                    {renderAbbr(skill.en ? t({ ru: skill.name, en: skill.en }) : skill.name, lang)} {skill.level}
+                                                </li>
+                                            ))
+                                    }
+                                </HStack>
                                 {
-                                    [...new Map(skills.flatMap(s => s.skills).map(s => [s.name, s])).values()]
-                                        .map(skill => (
-                                            <li style={{ whiteSpace: "nowrap" }}>
-                                                {skill.en ? t({ ru: skill.name, en: skill.en }) : skill.name} {skill.level}
-                                            </li>
+                                    [...new Map(skills.filter(s => !s.isAi).flatMap(s => s.skills).map(s => [s.name, s])).values()]
+                                        .filter((s: any) => s.childs)
+                                        .map((skill: any, i) => (
+                                            <div key={`normal-group-${i}`} style={{ width: "100%", marginTop: "0.5em", lineHeight: "1.4" }}>
+                                                <span style={{ fontSize: "0.85em", fontWeight: "bold" }}>
+                                                    {renderAbbr(skill.en ? t({ ru: skill.name, en: skill.en }) : skill.name, lang)}:
+                                                </span>{" "}
+                                                {
+                                                    skill.childs.map((child: any, j: number) => (
+                                                        <Fragment key={j}>
+                                                            {renderAbbr(child.en ? t({ ru: child.name, en: child.en }) : child.name, lang)}{child.level ? ` ${child.level}` : ""}
+                                                            {j < skill.childs.length - 1 ? ", " : ""}
+                                                        </Fragment>
+                                                    ))
+                                                }
+                                            </div>
                                         ))
                                 }
-                            </HStack>
+                                <div style={{ fontSize: "0.9em", fontWeight: "bold", borderBottom: "1px dashed #ccc", paddingBottom: "0.2em", marginTop: "0.3em", width: "100%" }}>
+                                    <T ru="ИИ и Агенты" en="AI & Agents" />
+                                </div>
+                                <VStack style={{ gap: "0.1em", width: "100%" }}>
+                                    <HStack tag="ul" className={cls.skills}>
+                                        {
+                                            [...new Map(skills.filter(s => s.isAi).flatMap(s => s.skills).map(s => [s.name, s])).values()]
+                                                .filter((s: any) => !s.childs)
+                                                .map((skill: any, i) => (
+                                                    <li style={{ whiteSpace: "nowrap" }} key={i}>
+                                                        {renderAbbr(skill.en ? t({ ru: skill.name, en: skill.en }) : skill.name, lang)} {skill.level}
+                                                    </li>
+                                                ))
+                                        }
+                                    </HStack>
+                                    {
+                                        [...new Map(skills.filter(s => s.isAi).flatMap(s => s.skills).map(s => [s.name, s])).values()]
+                                            .filter((s: any) => s.childs)
+                                            .map((skill: any, i) => (
+                                                <div key={`ai-group-${i}`} style={{ width: "100%", lineHeight: "1.4" }}>
+                                                    <span style={{ fontSize: "0.85em", fontWeight: "bold" }}>
+                                                        {renderAbbr(skill.en ? t({ ru: skill.name, en: skill.en }) : skill.name, lang)}:
+                                                    </span>{" "}
+                                                    {
+                                                        skill.childs.map((child: any, j: number) => (
+                                                            <Fragment key={j}>
+                                                                {renderAbbr(child.en ? t({ ru: child.name, en: child.en }) : child.name, lang)}{child.level ? ` ${child.level}` : ""}
+                                                                {j < skill.childs.length - 1 ? ", " : ""}
+                                                            </Fragment>
+                                                        ))
+                                                    }
+                                                </div>
+                                            ))
+                                    }
+                                </VStack>
+                            </VStack>
                         ],
                         [
                             <T ru={"Образование".toUpperCase()} en={"Education".toUpperCase()} />,
@@ -255,8 +437,8 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                         {u.name}, {u.city}
                                     </p>
                                     <ul>
-                                        {degrees.map((v) => (
-                                            <li>
+                                        {degrees.map((v, i) => (
+                                            <li key={i}>
                                                 <HStack tag="span" justify="between">
                                                     {v.degree} <TimeDiapason time={v.time} />
                                                 </HStack>

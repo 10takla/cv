@@ -1,4 +1,4 @@
-import { forwardRef, memo, ForwardedRef, ComponentProps, useImperativeHandle, useRef, ElementRef, useState, createContext, useContext, Dispatch, SetStateAction, ReactNode, useCallback, useEffect, useMemo, cloneElement } from 'react';
+import { forwardRef, memo, ForwardedRef, ComponentProps, useImperativeHandle, useRef, ElementRef, useState, createContext, useContext, Dispatch, SetStateAction, ReactNode, useCallback, useEffect, useMemo, cloneElement, isValidElement } from 'react';
 import { classNames } from '/src/shared/lib/classNames/classNames';
 import cls from './ToggleLanguage.module.scss';
 import Select from '/src/shared/ui/Kit/Select';
@@ -39,15 +39,14 @@ const ToggleLanguage = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) =>
     // }, [location, isNotNavigate]);
     const lang = useMemo(() => {
         if (isNotNavigate) return
-        const lang = location.pathname.split('/').pop();
+        const lang = location.pathname.split('/').filter(Boolean).pop();
         if (lang == "ru" || lang == "en") {
             setLang(lang)
             return lang
         }
     }, [location, isNotNavigate]);
-
     const navigate = useNavigate();
-
+console.log(lang)
     return (
         <>
             {/* {!isNotNavigate && <Routes>
@@ -85,11 +84,13 @@ export const t = (otherProps: Record<Lang, string>) => {
 
 export const T = ({ children, ...otherProps }: TProps) => {
     const [_, [lang]] = useContext(langContext)
-    let translatedChild = otherProps[lang] || children;
-    if (typeof translatedChild === "string") {
-        translatedChild = <>{translatedChild}</>;
+    const translatedChild = otherProps[lang] || children;
+    const { ru, en, ...restProps } = otherProps;
+
+    if (isValidElement(translatedChild)) {
+        return cloneElement(translatedChild, restProps);
     }
-    return cloneElement(translatedChild, otherProps)
+    return <>{translatedChild}</>;
 }
 
 

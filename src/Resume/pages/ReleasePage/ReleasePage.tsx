@@ -1,22 +1,21 @@
 import { forwardRef, memo, ForwardedRef, ComponentProps, useImperativeHandle, useRef, ElementRef } from 'react';
-import { HStack, VStack } from '/src/shared/ui/Stack';
-import { classNames } from '/src/shared/lib/classNames/classNames';
+import { HStack, VStack } from 'shared/ui/Stack';
+import { classNames } from 'shared/lib/classNames/classNames';
 import cls from './ReleasePage.module.scss';
-import pdf_cls from '../PdfPage.module.scss';
-import ToggleLanguage, { T } from '/src/Resume/shared/ui/ToggleLanguage/ToggleLanguage';
+import ToggleLanguage, { T } from 'resume/shared/ui/ToggleLanguage/ToggleLanguage';
 import Contacts from './ui/Contacts/Contacts';
-import Quote from '/src/Resume/sections/AboutMe/ui/Quote/Quote';
+import Quote from 'resume/sections/AboutMe/ui/Quote/Quote';
 import AboutMe from './ui/AboutMe/AboutMe';
-import FerrisSvg from "/src/Resume/shared/assets/imgs/Ferris.svg?react"
+import FerrisSvg from "resume/shared/assets/imgs/Ferris.svg?react"
 import Skills from 'resume/sections/Skills/Skills';
-import Block from '/src/Resume/shared/ui/Block/Block';
-import block_cls from '/src/Resume/shared/ui/Block/Block.module.scss';
-import PetProjects from '/src/Resume/sections/Experience/PetProjects/PetProjects';
+import Block from 'resume/shared/ui/Block/Block';
+import block_cls from 'resume/shared/ui/Block/Block.module.scss';
+import PetProjects from 'resume/sections/Experience/PetProjects/PetProjects';
 import WorkExperience from './ui/WorkExperience/WorkExperience';
 import Education from './ui/Education/Education';
 import { ot } from './ui/Experience/Experience';
 import SkillLine from './ui/SkillLine/SkillLine';
-import { Demo } from '/src/Resume';
+import { Demo } from "resume";
 
 type Component = typeof HStack;
 type ElRef = ElementRef<Component> | null;
@@ -40,8 +39,7 @@ const ReleasePage = (props: ReleasePageProps, ref: ForwardedRef<ElRef>) => {
 
     return (
         <VStack
-            className={classNames(cls.ReleasePage, [pdf_cls.pdf_page, className])}
-            id="release-page"
+            className={classNames(cls.ReleasePage, [className])}
             ref={releasePageRef}
             {...otherProps}
         >

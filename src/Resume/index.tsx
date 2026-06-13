@@ -1,15 +1,15 @@
-import { ComponentProps, ElementRef, ForwardedRef, forwardRef, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { ElementRef, ForwardedRef, forwardRef, Fragment, ReactNode, useContext, useEffect, useMemo } from "react";
 import { HStack, VStack } from "shared/ui/Stack";
-import { classNames } from "/src/shared/lib/classNames/classNames";
+import { classNames } from "shared/lib/classNames/classNames";
 import cls from "./index.module.scss";
 import { HtmlProps } from "@react-three/drei/web/Html";
 import ReleasePage from "./pages/ReleasePage/ReleasePage";
 import ToggleLanguage, { langContext, LanguageProvider } from "./shared/ui/ToggleLanguage/ToggleLanguage";
-import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 import SimplePage, { experienceData } from "./pages/SimplePage/SimplePage";
-import pdfСls from './pages/PdfPage.module.scss';
-import Pdf from "./shared/ui/Pdf/Pdf";
-import {experienceData as experienceDataV2} from "./pages/SimplePage/SimplePageV2"
+import { experienceData as experienceDataV2 } from "./pages/SimplePage/SimplePageV2"
+import Pdf from "./pages/ui/Pdf/Pdf";
+import { MicroSaaS, MicroSaaSV2 } from "./pages/SimplePage/sections/MicroSaaS";
 
 export const Chapter = forwardRef(({ className, children, head, ...otherProps }: { children: ReactNode } & HtmlProps, ref: ForwardedRef<ElementRef<typeof VStack>>) => {
     return (
@@ -48,6 +48,10 @@ export enum DemoMode {
 
 type SelectivPartial<P, K extends keyof P> = Omit<P, K> & Partial<Pick<P, K>>;
 
+export const ReleasePdfPage = ({ demo }: Demo) => <PdfPage id="release-page"><ReleasePage demo={demo} /></PdfPage>
+export const SimplePdfPage = ({ demo }: Demo) => <PdfPage id="simple-page"><SimplePage experienceData={experienceData} microSaaS={<MicroSaaS />} demo={demo} /></PdfPage>
+export const SimplePdfPageV2 = ({ demo }: Demo) => <PdfPage id="simple-page-v2"><SimplePage experienceData={experienceDataV2} microSaaS={<MicroSaaSV2 />} demo={demo} /></PdfPage>
+
 const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "demo">) => {
     useEffect(() => {
         (async () => {
@@ -57,46 +61,47 @@ const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "
     }, []);
 
     const pages = [
-        ["release-page", <PdfPage id="release-page"><ReleasePage demo={demo} /></PdfPage>],
-        ["simple-page", <PdfPage id="simple-page"><SimplePage experienceData={experienceData} demo={demo} /></PdfPage>],
-        ["simple-page-v2", <PdfPage id="simple-page-v2"><SimplePage experienceData={experienceDataV2} demo={demo} /></PdfPage>]
+        ["release-page", <ReleasePdfPage demo={demo} />],
+        ["simple-page", <SimplePdfPage demo={demo} />],
+        ["simple-page/v2", <SimplePdfPageV2 demo={demo} />],
     ]
-
 
     return (
         <HStack className={cls.App} style={{ gap: "0.5em" }} >
             <LanguageProvider lang="ru">
-                <SiteName demo={demo} />
+                {(() => {
+                    const V = () => {
+                        useSiteName(demo)
+                        return null
+                    }
+                    return (<V />)
+                })()}
                 <Routes>
-                    {pages.map(([linkName, page]) => (
-                        <>
+                    {pages.map(([linkName, page], i) => (
+                        <Fragment key={i}>
                             <Route path={linkName} element={<Navigate to="ru" replace />} />
                             <Route path={`${linkName}/*`} element={page} />
-                        </>
+                        </Fragment>
                     ))}
                     <Route index element={<Navigate to="ru" replace />} />
                     <Route
                         path="ru/*"
                         element={
                             <HStack style={{ gap: "1.2em" }}>
-                                {
-                                    pages.map(([linkName, page]) => {
-                                        return (
-                                            <VStack style={{ gap: "0.6em" }} >
-                                                <Link to={`../${linkName}/ru`}
-                                                    style={{
-                                                        background: "white",
-                                                        textAlign: "center",
-                                                        padding: "0.4em"
-                                                    }}
-                                                >
-                                                    {linkName}
-                                                </Link>
-                                                {page}
-                                            </VStack>
-                                        )
-                                    })
-                                }
+                                {pages.map(([linkName, page], i) => (
+                                    <VStack style={{ gap: "0.6em" }} key={i}>
+                                        <Link to={`../${linkName}/ru`} className={cls.link}
+                                            style={{
+                                                background: "white",
+                                                textAlign: "center",
+                                                padding: "0.4em"
+                                            }}
+                                        >
+                                            {linkName}
+                                        </Link>
+                                        {page}
+                                    </VStack>
+                                ))}
                             </HStack>
                         } />
                 </Routes>
@@ -108,11 +113,11 @@ const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "
 const PdfPage = ({ children, id }) => {
     return (
         <VStack
-            className={classNames(pdfСls.pdfPage)}
+            className={classNames(cls.pdfPage)}
             id={id}
         >
             {children}
-            <HStack className={pdfСls.lang} aria-current="true">
+            <HStack className={cls.lang} aria-current="true">
                 <ToggleLanguage className={cls.toggleLanguage} />
                 <Pdf id={id} className={cls.pdf} />
             </HStack>
@@ -120,7 +125,7 @@ const PdfPage = ({ children, id }) => {
     )
 }
 
-const SiteName = ({ demo }: Demo) => {
+const useSiteName = (demo: Demo.demo) => {
     const [_, [lang]] = useContext(langContext);
 
     const titleData: [HTMLTitleElement, string | null] | null = useMemo(() => {
@@ -141,8 +146,6 @@ const SiteName = ({ demo }: Demo) => {
             title.textContent = preTitle
         }
     }, [lang, titleData]);
-
-    return null
 };
 
 export default App;
