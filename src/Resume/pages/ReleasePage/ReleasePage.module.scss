@@ -42,16 +42,15 @@
             position: absolute;
             top: 0;
             right: 0;
-            aspect-ratio: 1/1;
             appearance: none;
-            border-radius: 0 0 0 50%;
+            border-radius: 0 0 0 0.8em;
 
-            $padding: 0.4em;
+            $padding: 0.5em;
             padding-left: $padding;
             padding-bottom: $padding;
-            padding-top: $padding * 0.5;
+            padding-top: $padding * 0.75;
             padding-right: $padding * 0.5;
-            font-size: 2em;
+            font-size: 2.5em;
             // font-weight: bold;
             // $border: 0.16em #29343d solid;
             // border-left: $border;

@@ -5,18 +5,47 @@ import Select from '/src/shared/ui/Kit/Select';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HtmlProps } from '@react-three/drei/web/Html';
 import { LANGUAGES } from '../../../../../configs/pages';
+import { Flex } from '/src/shared/ui/Stack';
 
 type Component = typeof Select;
 type ElRef = ElementRef<Component> | null;
 
 interface ToggleLanguageProps extends Omit<ComponentProps<Component>, "onChange" | "values"> {
-    isNotNavigate?: boolean
+    isNotNavigate?: boolean;
+    map?: (lang: Lang | undefined, flagStyle: any) => ReactNode;
 }
 
-const ToggleLanguage = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) => {
+const ToggleLanguageTextComponent = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) => {
+    return (
+        <ToggleLanguageBase
+            map={(lang, flagStyle) => <>{lang === LANGUAGES.EN ? "English" : "Русский"}</>}
+            {...props}
+            ref={ref}
+        />
+    )
+};
+
+const ToggleLanguageFlagComponent = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) => {
+    return (
+        <ToggleLanguageBase
+            map={(lang, flagStyle) => (
+                <img
+                    src={lang === LANGUAGES.EN ? "https://flagcdn.com/gb.svg" : "https://flagcdn.com/ru.svg"}
+                    alt={lang === LANGUAGES.EN ? "Eng" : "Рус"}
+                    style={flagStyle}
+                />
+            )}
+            {...props}
+            ref={ref}
+        />
+    )
+};
+
+const ToggleLanguageBase = forwardRef((props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) => {
     const {
         className,
         isNotNavigate,
+        map,
         ...otherProps
     } = props;
 
@@ -25,6 +54,18 @@ const ToggleLanguage = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) =>
         ref,
         () => toggleLanguageRef.current,
     );
+
+    const detailsRef = useRef<HTMLDetailsElement>(null);
+    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, value: string) => {
+        if (!isNotNavigate) {
+            e.preventDefault();
+            navigate(getLangUrl(value), { replace: true });
+        }
+        setLang(value as Lang);
+        if (detailsRef.current) {
+            detailsRef.current.removeAttribute('open');
+        }
+    };
 
     const [_, [__, setLang]] = useContext(langContext)
 
@@ -48,31 +89,67 @@ const ToggleLanguage = (props: ToggleLanguageProps, ref: ForwardedRef<ElRef>) =>
     }, [location, isNotNavigate]);
     const navigate = useNavigate();
 
+    const getLangUrl = (value: string) => {
+        const segments = location.pathname.split('/').filter(Boolean);
+        if (segments.length > 0) {
+            segments[segments.length - 1] = value;
+            const base = import.meta.env.BASE_URL || '/';
+            const path = '/' + segments.join('/');
+            return (base + path + location.search + location.hash).replace(/\/+/g, '/');
+        }
+        return '/' + value;
+    };
+
+    const flagStyle = {
+        // width: '20px',
+        // height: '15px',
+        width: "2em",
+        objectFit: 'cover' as const,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+
+    };
+
     return (
         <>
-            <Select
+            <details
+                ref={detailsRef}
                 className={classNames(cls.ToggleLanguage, [className])}
-                ref={toggleLanguageRef}
-                values={[[LANGUAGES.RU, "Рус"], [LANGUAGES.EN, "Eng"]]}
-                value={lang}
-                defaultValue={lang}
-                {...otherProps}
-                onChange={(value) => {
-                    if (!isNotNavigate) {
-                        const segments = location.pathname.split('/').filter(Boolean);
-                        if (segments.length > 0) {
-                            segments[segments.length - 1] = value;
-                            navigate('/' + segments.join('/') + location.search + location.hash, { replace: true });
-                        }
-                    }
-                    setLang(value as Lang);
-                }}
-            />
+            >
+                <Flex tag="summary" justify="center" align="center" style={{ cursor: 'pointer' }}>
+                    {map?.(lang, flagStyle)}
+                </Flex>
+                <ul className={cls.optionsList}>
+                    <li className={cls.optionItem}>
+                        <a href={getLangUrl(LANGUAGES.RU)} className={cls.optionLink} onClick={(e) => handleLinkClick(e, LANGUAGES.RU)}>
+                            <img
+                                src="https://flagcdn.com/ru.svg"
+                                alt="Русский"
+                                style={flagStyle}
+                            />
+                            Русский
+                        </a>
+                    </li>
+                    <li className={cls.optionItem}>
+                        <a href={getLangUrl(LANGUAGES.EN)} className={cls.optionLink} onClick={(e) => handleLinkClick(e, LANGUAGES.EN)}>
+                            <img
+                                src="https://flagcdn.com/gb.svg"
+                                alt="English"
+                                style={flagStyle}
+                            />
+                            English
+                        </a>
+                    </li>
+                </ul>
+            </details>
         </>
     )
-};
+});
 
-export default memo(forwardRef(ToggleLanguage));
+export const ToggleLanguageText = memo(forwardRef(ToggleLanguageTextComponent));
+export const ToggleLanguageFlag = memo(forwardRef(ToggleLanguageFlagComponent));
+
+export default ToggleLanguageFlag;
 
 type LangProps = {
     [key in Lang | "children"]?: ReactNode | string;
