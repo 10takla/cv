@@ -102,7 +102,7 @@ export type Lang = typeof LANGUAGES[keyof typeof LANGUAGES];
 export const langContext = createContext<[(key: string) => string, [Lang, Dispatch<SetStateAction<Lang>>]]>([(key) => key, [LANGUAGES.EN, () => { }]])
 
 export const LanguageProvider = ({ children, lang: l }: { children: ReactNode, lang: Lang }) => {
-    const [lang, setLang] = useState<Lang>(l)
+    const [lang, setLang] = useState<Lang>(l);
 
     const t = useCallback((key: string) => {
     }, [lang]);
@@ -115,5 +115,5 @@ export const LanguageProvider = ({ children, lang: l }: { children: ReactNode, l
         <langContext.Provider value={[t, [lang, setLang]]}>
             {children}
         </langContext.Provider>
-    )
-}
+    );
+};

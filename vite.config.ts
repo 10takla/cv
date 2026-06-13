@@ -81,6 +81,9 @@ export default defineConfig(({ mode }) => {
 
         await runInPool(ROUTES, concurrency, async (route) => {
           const page = await browser.newPage();
+          page.on('pageerror', (err) => {
+            console.error(`[Prerender Error] Route: ${route} -`, err.message);
+          });
           try {
             const requestedPath = ('/' + [BASE, route].filter(Boolean).join('/')).replace(/\/+/g, '/');
             await page.goto(`http://localhost:${PORT}${requestedPath}`, { waitUntil: 'domcontentloaded' });
@@ -89,6 +92,7 @@ export default defineConfig(({ mode }) => {
               page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 800 }).catch(() => { }),
             ]);
             let html = await page.content();
+            console.log(`[Prerender] Rendered: ${requestedPath}`);
 
             const currentUrl = new URL(page.url());
             const origUrl = new URL(requestedPath, `http://localhost:${PORT}`);
