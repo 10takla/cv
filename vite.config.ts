@@ -20,6 +20,7 @@ const languages = Object.values(LANGUAGES);
 
 export const baseConfig = (mode) => ({
   server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
+  preview: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   build: { target: 'es2019' },
   base: mode === 'deploy' ? '/cv/' : '/',
   resolve: {

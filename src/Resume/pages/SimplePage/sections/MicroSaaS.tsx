@@ -17,12 +17,6 @@ export const MicroSaaS = () => (
                 ru="облачный сервис предпросмотра и проверки печатных шаблонов для термопринтеров."
                 en="cloud service for previewing and validating thermal printer label templates."
             />
-            <HStack style={{
-                gap: "0.2em",
-            }}>
-                <div style={{ display: "inline-flex", width: "2em", boxSizing: "border-box" }} title={t({ ru: "Проприетарный / Закрытый исходный код", en: "Proprietary / Closed Source" })}><PrivateConnectivitySvg /></div>
-                {/* <div style={{ display: "inline-flex", }} title={t({ ru: "В разработке", en: "Under development" })}><ConstructionSvg /></div> */}
-            </HStack>
         </HStack>
         <VStack style={{ width: "100%" }}>
             <Diagram diagram={`
