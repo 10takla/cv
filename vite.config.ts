@@ -22,7 +22,7 @@ export const baseConfig = (mode) => ({
   server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   preview: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   build: { target: 'es2019' },
-  base: ['deploy', 'prerender'].includes(mode) ? '/cv/' : '/',
+  base: mode === 'deploy' ? '/cv/' : '/',
   resolve: {
     alias: [
       { find: 'shared', replacement: '/src/shared' },
@@ -46,7 +46,7 @@ async function runInPool<T>(items: T[], limit: number, fn: (item: T) => Promise<
 }
 
 export default defineConfig(({ mode }) => {
-  const BASE = ['deploy', 'prerender'].includes(mode) ? '/cv' : '';
+  const BASE = mode === 'deploy' ? '/cv' : '';
 
   const ROUTES = [
     ...modes,
@@ -82,7 +82,7 @@ export default defineConfig(({ mode }) => {
         await runInPool(ROUTES, concurrency, async (route) => {
           const page = await browser.newPage();
           page.on('pageerror', (err) => {
-            console.error(`[Prerender Error] Route: ${route} -`, err.message);
+            console.error(`[Render Error] Route: ${route} -`, err.message);
           });
           try {
             const requestedPath = ('/' + [BASE, route].filter(Boolean).join('/')).replace(/\/+/g, '/');
@@ -96,7 +96,7 @@ export default defineConfig(({ mode }) => {
               return Array.from(diagrams).every(d => d.querySelector('svg') !== null);
             }, { timeout: 10000 }).catch(() => { });
             let html = await page.content();
-            console.log(`[Prerender] Rendered: ${requestedPath}`);
+            console.log(`Rendered: ${requestedPath}`);
 
             const currentUrl = new URL(page.url());
             const origUrl = new URL(requestedPath, `http://localhost:${PORT}`);
@@ -161,7 +161,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     ...baseConfig(mode),
-    appType: ['production', 'deploy', 'prerender'].includes(mode) ? 'mpa' : 'spa',
+    appType: ['production', 'deploy'].includes(mode) ? 'mpa' : 'spa',
     plugins: [svgr(), react(), prerender(), redirectTrailingSlash()],
   };
 });
