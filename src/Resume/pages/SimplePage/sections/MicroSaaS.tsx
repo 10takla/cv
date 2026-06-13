@@ -148,5 +148,5 @@ export const Diagram = ({ diagram, ...props }: { diagram: string } & React.HTMLA
         };
     }, [diagram, uniqueId]); // Добавьте diagram в зависимости, чтобы график обновлялся при изменении текста
 
-    return <div {...props} ref={hostRef} />;
+    return <div {...props} ref={hostRef} className={`mermaid-diagram ${props.className || ''}`} />;
 }

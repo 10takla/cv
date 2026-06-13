@@ -59,7 +59,7 @@ const ToggleLanguageBase = forwardRef((props: ToggleLanguageProps, ref: Forwarde
     const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, value: string) => {
         if (!isNotNavigate) {
             e.preventDefault();
-            navigate(getLangUrl(value), { replace: true });
+            navigate(getLangPath(value), { replace: true });
         }
         setLang(value as Lang);
         if (detailsRef.current) {
@@ -89,15 +89,19 @@ const ToggleLanguageBase = forwardRef((props: ToggleLanguageProps, ref: Forwarde
     }, [location, isNotNavigate]);
     const navigate = useNavigate();
 
-    const getLangUrl = (value: string) => {
+    const getLangPath = (value: string) => {
         const segments = location.pathname.split('/').filter(Boolean);
         if (segments.length > 0) {
             segments[segments.length - 1] = value;
-            const base = import.meta.env.BASE_URL || '/';
-            const path = '/' + segments.join('/');
-            return (base + path + location.search + location.hash).replace(/\/+/g, '/');
+            return '/' + segments.join('/') + location.search + location.hash;
         }
         return '/' + value;
+    };
+
+    const getLangUrl = (value: string) => {
+        const path = getLangPath(value);
+        const base = import.meta.env.BASE_URL || '/';
+        return (base + path).replace(/\/+/g, '/');
     };
 
     const flagStyle = {

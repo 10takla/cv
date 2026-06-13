@@ -9,7 +9,7 @@
     "build:ssg": "vite-react-ssg build --config vite.config.ssg.ts",
     "build:storybook": "storybook build",
     "start": "vite dev",   
-    "start:prerender": "vite build --mode prerender && vite preview",
+    "start:prerender": "vite build --mode prerender && vite preview --mode prerender",
     "preview": "vite preview",
     "start:ssg": "vite-react-ssg dev --config vite.config.ssg.ts",
     "start:dev:vite": "concurrently \"npm run start:vite\" \"npm run start:dev:server\"",

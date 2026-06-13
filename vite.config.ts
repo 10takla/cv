@@ -22,7 +22,7 @@ export const baseConfig = (mode) => ({
   server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   preview: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   build: { target: 'es2019' },
-  base: mode === 'deploy' ? '/cv/' : '/',
+  base: ['deploy', 'prerender'].includes(mode) ? '/cv/' : '/',
   resolve: {
     alias: [
       { find: 'shared', replacement: '/src/shared' },
@@ -46,7 +46,7 @@ async function runInPool<T>(items: T[], limit: number, fn: (item: T) => Promise<
 }
 
 export default defineConfig(({ mode }) => {
-  const BASE = mode === 'deploy' ? '/cv' : '';
+  const BASE = ['deploy', 'prerender'].includes(mode) ? '/cv' : '';
 
   const ROUTES = [
     ...modes,
@@ -87,10 +87,14 @@ export default defineConfig(({ mode }) => {
           try {
             const requestedPath = ('/' + [BASE, route].filter(Boolean).join('/')).replace(/\/+/g, '/');
             await page.goto(`http://localhost:${PORT}${requestedPath}`, { waitUntil: 'domcontentloaded' });
-            await Promise.race([
-              page.evaluate(() => new Promise(r => setTimeout(r, 1000))),
-              page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 800 }).catch(() => { }),
-            ]);
+            // Wait for general page mount/readiness
+            await page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 2000 }).catch(() => { });
+            // If the page contains a diagram container, wait for the SVG to render
+            await page.waitForFunction(() => {
+              const diagrams = document.querySelectorAll('.mermaid-diagram');
+              if (diagrams.length === 0) return true;
+              return Array.from(diagrams).every(d => d.querySelector('svg') !== null);
+            }, { timeout: 10000 }).catch(() => { });
             let html = await page.content();
             console.log(`[Prerender] Rendered: ${requestedPath}`);
 
@@ -135,7 +139,10 @@ export default defineConfig(({ mode }) => {
     name: 'redirect-trailing-slash',
     configurePreviewServer(server) {
       server.middlewares.use((req, res, next) => {
-        const urlPath = req.url?.split('?')[0] || '';
+        let urlPath = req.url?.split('?')[0] || '';
+        if (BASE && urlPath.startsWith(BASE)) {
+          urlPath = urlPath.slice(BASE.length);
+        }
         const filePath = path.join(__dirname, 'dist', urlPath);
         try {
           if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory() && !urlPath.endsWith('/')) {
