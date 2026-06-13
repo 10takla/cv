@@ -6,6 +6,8 @@ import fs from 'fs';
 import http from 'http';
 import sirv from 'sirv';
 import puppeteer from 'puppeteer';
+import os from 'os';
+
 import {
   MODES,
   PAGES,
@@ -19,7 +21,7 @@ const languages = Object.values(LANGUAGES);
 export const baseConfig = (mode) => ({
   server: { host: '0.0.0.0', port: 3000, allowedHosts: ["fervently-strong-muskellunge.cloudpub.ru"] },
   build: { target: 'es2019' },
-  base: mode === 'deploy' ? '/cv/' : '',
+  base: mode === 'deploy' ? '/cv/' : '/',
   resolve: {
     alias: [
       { find: 'shared', replacement: '/src/shared' },
@@ -29,10 +31,25 @@ export const baseConfig = (mode) => ({
   esbuild: { supported: { 'top-level-await': true } }
 })
 
+async function runInPool<T>(items: T[], limit: number, fn: (item: T) => Promise<void>) {
+  const queue = [...items];
+  const workers = Array(Math.min(limit, queue.length)).fill(null).map(async () => {
+    while (queue.length > 0) {
+      const item = queue.shift();
+      if (item !== undefined) {
+        await fn(item);
+      }
+    }
+  });
+  await Promise.all(workers);
+}
+
 export default defineConfig(({ mode }) => {
   const BASE = mode === 'deploy' ? '/cv' : '';
 
   const ROUTES = [
+    ...modes,
+    ...modes.flatMap(mode => pages.map(p => [mode, p].join("/"))),
     ...modes.flatMap(mode => (
       languages.map(lang => [mode, lang].join("/"))
     )),
@@ -41,7 +58,7 @@ export default defineConfig(({ mode }) => {
     )),
     "/"
   ];
-  console.log(ROUTES)
+
   const PORT = 4179;
 
   const prerender = () => ({
@@ -55,43 +72,84 @@ export default defineConfig(({ mode }) => {
       });
       await new Promise<void>(r => server.listen(PORT, r));
 
-      const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'], executablePath: process.env.PUPPETEER_EXECUTABLE_PATH });
+      const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'], executablePath: process.env.PUPPETEER_EXECUTABLE_PATH });
       try {
-        for (const route of ROUTES) {
+        const concurrency = process.env.PRERENDER_CONCURRENCY
+          ? parseInt(process.env.PRERENDER_CONCURRENCY, 10)
+          : Math.min(os.cpus().length || 4, 8);
+
+        await runInPool(ROUTES, concurrency, async (route) => {
           const page = await browser.newPage();
-          await page.goto(`http://localhost:${PORT}${BASE}/${route}`, { waitUntil: 'domcontentloaded' });
-          await Promise.race([
-            page.evaluate(() => new Promise(r => setTimeout(r, 1000))),
-            page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 800 }).catch(() => { }),
-          ]);
-          let html = await page.content();
+          try {
+            const requestedPath = ('/' + [BASE, route].filter(Boolean).join('/')).replace(/\/+/g, '/');
+            await page.goto(`http://localhost:${PORT}${requestedPath}`, { waitUntil: 'domcontentloaded' });
+            await Promise.race([
+              page.evaluate(() => new Promise(r => setTimeout(r, 1000))),
+              page.waitForFunction(() => (window as any).__PRERENDER_READY__ === true, { timeout: 800 }).catch(() => { }),
+            ]);
+            let html = await page.content();
 
-          // html = html.replace(
-          //   /<script\b[^>]*>([\s\S]*?)<\/script>/gi,
-          //   (full) => /type=["']application\/ld\+json["']/i.test(full) ? full : ''
-          // );
-          // html = html.replace(
-          //   /<link\s+[^>]*rel=["'](?:modulepreload|preload)["'][^>]*as=["']script["'][^>]*>/gi,
-          //   ''
-          // );
-          // html = html.replace(/<script\b[^>]*vite[-]client[^>]*><\/script>/gi, '');
+            const currentUrl = new URL(page.url());
+            const origUrl = new URL(requestedPath, `http://localhost:${PORT}`);
 
-          const clean = route.replace(new RegExp('^' + BASE.replace(/\//g, '\\/')), '');
-          const outDir = path.join(dist, clean.replace(/\/$/, ''));
-          await fs.promises.mkdir(outDir, { recursive: true });
-          await fs.promises.writeFile(path.join(outDir, 'index.html'), html, 'utf8');
+            const currentPath = currentUrl.pathname.replace(/\/$/, '');
+            const origPath = origUrl.pathname.replace(/\/$/, '');
 
-          await page.close();
-        }
+            const clean = route.replace(new RegExp('^' + BASE.replace(/\//g, '\\/')), '');
+            const outDir = path.join(dist, clean.replace(/\/$/, ''));
+            await fs.promises.mkdir(outDir, { recursive: true });
+
+            if (currentPath !== origPath) {
+              // A redirect occurred! Extract the redirect target path
+              const redirectTarget = currentUrl.pathname + currentUrl.search + currentUrl.hash;
+              const redirectHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="0; url=${redirectTarget}">
+    <title>Redirecting...</title>
+</head>
+<body>
+</body>
+</html>`;
+              await fs.promises.writeFile(path.join(outDir, 'index.html'), redirectHtml, 'utf8');
+            } else {
+              // No redirect, write the rendered HTML content
+              await fs.promises.writeFile(path.join(outDir, 'index.html'), html, 'utf8');
+            }
+          } finally {
+            await page.close();
+          }
+        });
       } finally {
         await browser.close();
         server.close();
       }
     },
   });
+  const redirectTrailingSlash = () => ({
+    name: 'redirect-trailing-slash',
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const urlPath = req.url?.split('?')[0] || '';
+        const filePath = path.join(__dirname, 'dist', urlPath);
+        try {
+          if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory() && !urlPath.endsWith('/')) {
+            res.statusCode = 301;
+            res.setHeader('Location', (req.url || '') + '/');
+            res.end();
+            return;
+          }
+        } catch (e) {
+          // ignore
+        }
+        next();
+      });
+    },
+  });
 
   return {
     ...baseConfig(mode),
-    plugins: [svgr(), react(), prerender()],
+    appType: ['production', 'deploy', 'prerender'].includes(mode) ? 'mpa' : 'spa',
+    plugins: [svgr(), react(), prerender(), redirectTrailingSlash()],
   };
 });

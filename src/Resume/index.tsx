@@ -57,6 +57,7 @@ const App = ({ demo = new DemoStuct(DemoMode.Release) }: SelectivPartial<Demo, "
     useEffect(() => {
         (async () => {
             try { if ('fonts' in document) await (document as any).fonts.ready } catch { }
+            (window as any).__PRERENDER_READY__ = true;
             document.dispatchEvent(new Event('prerender-ready'))
         })()
     }, []);
