@@ -103,24 +103,30 @@ const other = {
 }
 
 const aiSkills = {
-    // --- Агентные менеджеры / AI IDE ---
-    "Antigravity": { stars: 5, isId: true },
-    "Codex": { stars: 5, isId: true },
-    "Claude Code": { stars: 4, isId: true },
-    "OpenCode": { stars: 4, isId: true },
+    "Инструменты": {
+        en: "Tools",
+        childs: {
+            // --- Агентные менеджеры / AI IDE ---
+            "Antigravity": { stars: 5, isId: true },
+            "Codex": { stars: 5, isId: true },
+            "Claude Code": { stars: 4, isId: true },
+            "OpenCode": { stars: 4, isId: true },
 
-    // --- Чат-интерфейсы / Playground ---
-    "Google AI Studio": { stars: 5, isId: true },
-    "OpenAI Playground": { stars: 3, isId: true },
-    "Claude.ai": { stars: 4, isId: true },
-    "Grok": { stars: 3, isId: true },
-    "DeepSeek": { stars: 3, isId: true },
-    "Perplexity": { stars: 3, isId: true },
+            // --- Чат-интерфейсы / Playground ---
+            "Google AI Studio": { stars: 5, isId: true },
+            "OpenAI Playground": { stars: 3, isId: true },
+            "Claude.ai": { stars: 4, isId: true },
+            "Grok": { stars: 3, isId: true },
+            "DeepSeek": { stars: 3, isId: true },
+            "Perplexity": { stars: 3, isId: true },
+            "NotebookLM": { stars: 4, isId: true },
+        }
+    },
 
     // --- Промпт-инжиниринг ---
     "Prompt Engineering": {
         "childs": {
-            "System Prompts (rules, skills, workflows)": { stars: 3, isId: true }, // Написание системных инструкций: правила поведения, навыки, сценарии
+            "System Prompts": { stars: 3, isId: true }, // Написание системных инструкций: правила поведения, навыки, сценарии
             "Few-shot Prompting": { stars: 3, isId: true }, // Обучение модели на примерах прямо в промпте
             "Chain-of-Thought": { stars: 3, isId: true }, // Побуждение модели рассуждать пошагово
             "Prompt Versioning": { stars: 3, isId: true }, // Версионирование промптов в файлах (md, git)
@@ -134,10 +140,19 @@ const aiSkills = {
             "MCP": { stars: 3, isId: true },
             // Управление несколькими агентами: делегирование, координация
             "Agent Orchestration": { stars: 3, isId: true },
+            // Управление окном контекста: что передавать, что обрезать
+            "Context Engineering": { stars: 3, isId: true },
             // Подключение внешних баз знаний к агенту
             "Knowledge Bases": { stars: 3, isId: true },
-            // Управление окном контекста: что передавать, что обрезать
-            "Context Management": { stars: 3, isId: true },
+        }
+    },
+
+    "LLM": {
+        "childs": {
+            "Model Selection": { stars: 3, isId: true },
+            "Model Evaluation": { stars: 3, isId: true },
+            "Token Usage Analysis": { stars: 3, isId: true },
+            "Cost Estimation": { stars: 3, isId: true },
         }
     },
 

@@ -429,6 +429,8 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                             <T ru="Проекты" en="Projects" />:
                                         </span>{" "}
                                         {[
+                                            { name: "speech-to-text", link: "https://github.com/10takla/speech-to-text" },
+                                            { name: "multi-lang-subtitles-extension", link: "https://github.com/10takla/multi-lang-subtitles-extension" },
                                             { name: "ai_drafts", link: "https://github.com/10takla/ai_drafts" },
                                             { name: "ai_manager", link: "https://github.com/10takla/ai_manager" },
                                             { name: "impl_instrs", link: "https://github.com/10takla/impl_instrs" },
