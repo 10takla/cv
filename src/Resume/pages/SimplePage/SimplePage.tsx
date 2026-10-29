@@ -218,7 +218,7 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                             >
                                 {exprienceList
                                     .map(({ time, ...other }) => ({ ...other, time: time.map((v) => new Date(v)) }))
-                                    .map(({ name, position, description, time, achievements, stack }, i) => (
+                                    .map(({ name, position, description, time, achievements, stack, projects }, i) => (
                                         <VStack tag="article" key={i}
                                             style={{
                                                 gap: "0.3em",
@@ -240,65 +240,71 @@ const SimplePage = (props: SimplePageProps, ref: ForwardedRef<ElRef>) => {
                                             </HStack>
                                             <VStack tag="section" align="start" style={{ gap: "0.3em" }}>
                                                 <p>{"— "}{renderAbbr(description, lang)}.</p>
-                                                <VStack tag="ul" className={cls.achievements}
-                                                    style={{ gap: "0.2em" }}
-                                                >
-                                                    {achievements.map((v, i) => (
-                                                        <li key={i}>
-                                                            {
-                                                                Array.isArray(v) ?
-                                                                    <VStack style={{ gap: "0.2em" }}>
-                                                                        {
-                                                                            v.map((v, i) => (
-                                                                                Array.isArray(v) ?
-                                                                                    <VStack tag="ul" key={i}
-                                                                                        style={{ gap: "0.2em" }}
-                                                                                    >
-                                                                                        {v.map((item, i) => (
-                                                                                            <li key={i}>
-                                                                                                {renderAbbr(item, lang)}
-                                                                                                {
-                                                                                                    i != v.length - 1 ?
-                                                                                                        ";"
-                                                                                                        :
-                                                                                                        "."
-                                                                                                }
-                                                                                            </li>
-                                                                                        ))}
-                                                                                    </VStack>
-                                                                                    :
-                                                                                    <span key={i}>{renderAbbr(v, lang)}:</span>
-                                                                            ))
-                                                                        }
-                                                                    </VStack>
-                                                                    :
-                                                                    <>{renderAbbr(v, lang)}.</>
-                                                            }
-                                                        </li>
-                                                    ))}
-                                                </VStack>
-                                                <HStack
-                                                    tag="ul"
-                                                    align="center"
-                                                    style={{
-                                                        listStyleType: "none",
-                                                        columnGap: "1em",
-                                                        paddingLeft: "unset",
-                                                        flexWrap: "wrap"
-                                                    }}
-                                                    // {...stackProps}
-                                                    className={cls.stack}
-                                                >
-                                                    {stack.flat().map((v, i) => (
-                                                        <li key={i} style={{ whiteSpace: "nowrap" }}>
-                                                            {/* <i> */}
-                                                            {renderAbbr((typeof v == "object" && "name" in v) ?
-                                                                v.name
-                                                                : v, lang)}
-                                                            {/* </i> */}
-                                                        </li>
-                                                    ))}
-                                                </HStack>
+                                                {(projects ?? [{ achievements, stack }]).map(({ achievements, stack }, projectIndex) => (
+                                                    <VStack key={projectIndex} tag="section" align="start"
+                                                        style={{ gap: "0.3em", width: "100%", marginTop: projectIndex > 0 ? "0.4em" : undefined }}
+                                                    >
+                                                        <VStack tag="ul" className={cls.achievements}
+                                                            style={{ gap: "0.2em" }}
+                                                        >
+                                                            {achievements.map((v, i) => (
+                                                                <li key={i}>
+                                                                    {
+                                                                        Array.isArray(v) ?
+                                                                            <VStack style={{ gap: "0.2em" }}>
+                                                                                {
+                                                                                    v.map((v, i) => (
+                                                                                        Array.isArray(v) ?
+                                                                                            <VStack tag="ul" key={i}
+                                                                                                style={{ gap: "0.2em" }}
+                                                                                            >
+                                                                                                {v.map((item, i) => (
+                                                                                                    <li key={i}>
+                                                                                                        {renderAbbr(item, lang)}
+                                                                                                        {
+                                                                                                            i != v.length - 1 ?
+                                                                                                                ";"
+                                                                                                                :
+                                                                                                                "."
+                                                                                                        }
+                                                                                                    </li>
+                                                                                                ))}
+                                                                                            </VStack>
+                                                                                            :
+                                                                                            <span key={i}>{renderAbbr(v, lang)}:</span>
+                                                                                    ))
+                                                                                }
+                                                                            </VStack>
+                                                                            :
+                                                                            <>{renderAbbr(v, lang)}.</>
+                                                                    }
+                                                                </li>
+                                                            ))}
+                                                        </VStack>
+                                                        <HStack
+                                                            tag="ul"
+                                                            align="center"
+                                                            style={{
+                                                                listStyleType: "none",
+                                                                columnGap: "1em",
+                                                                paddingLeft: "unset",
+                                                                flexWrap: "wrap"
+                                                            }}
+                                                            // {...stackProps}
+                                                            className={cls.stack}
+                                                        >
+                                                            {stack.flat().map((v, i) => (
+                                                                <li key={i} style={{ whiteSpace: "nowrap" }}>
+                                                                    {/* <i> */}
+                                                                    {renderAbbr((typeof v == "object" && "name" in v) ?
+                                                                        v.name
+                                                                        : v, lang)}
+                                                                    {/* </i> */}
+                                                                </li>
+                                                            ))}
+                                                        </HStack>
+                                                    </VStack>
+                                                ))}
                                             </VStack>
                                         </VStack>
                                     ))
