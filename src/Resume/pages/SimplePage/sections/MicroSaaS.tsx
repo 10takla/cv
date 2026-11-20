@@ -12,10 +12,10 @@ export const MicroSaaS = () => (
         <HStack style={{
             justifyContent: "space-between"
         }}>
-            {"ZTC Renderer — "}
+            {"PrintCheck — "}
             <T
-                ru="облачный сервис предпросмотра и проверки печатных шаблонов для термопринтеров."
-                en="cloud service for previewing and validating thermal printer label templates."
+                ru="облачный сервис предпросмотра и проверки печатных форм и шаблонов."
+                en="cloud service for previewing and validating print layouts and templates."
             />
         </HStack>
         <VStack style={{ width: "100%" }}>
@@ -54,10 +54,10 @@ export const MicroSaaS = () => (
 
 export const MicroSaaSV2 = () => (
     <>
-        {"ZTC Renderer — "}
+        {"PrintCheck — "}
         <T
-            ru="облачный сервис предпросмотра и проверки печатных шаблонов для термопринтеров."
-            en="cloud service for previewing and validating thermal printer label templates."
+            ru="облачный сервис предпросмотра и проверки печатных форм и шаблонов."
+            en="cloud service for previewing and validating print layouts and templates."
         />
         <VStack style={{ width: "100%" }}>
             <Diagram diagram={`

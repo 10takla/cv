@@ -93,7 +93,7 @@ export const contactsList = [
         text: "crates.io",
     },
     {
-        link: "https://hh.ru/resume/5b9c4b92ff0ec486e40039ed1f476b7855654d?hhtmFrom=resume_list&print=true",
+        link: "https://hh.ru/resume/5b9c4b92ff0ec486e40039ed1f476b7855654d?print=true",
         svg: <HHRuSvg />,
         text: "hh.ru",
     },
